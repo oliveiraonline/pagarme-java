@@ -148,10 +148,25 @@ public class SubscriptionTest extends BaseTest {
     }
 
     @Test
-    public void testSplitSubscription() throws Throwable {
+    public void testSplitSubscriptionPercentage() throws Throwable {
 
         Subscription subscription = subscriptionFactory.createCreditCardSubscription(defaultPlanWithoutTrialDays.getId(),defaultCard.getId(), defaultCustomer);
         Collection<SplitRule> splitRules = splitRulesFactory.createSplitRuleWithPercentage();
+
+        subscription.setSplitRules(splitRules);
+        subscription.save();
+
+        Transaction foundTransaction = new Transaction().find(subscription.getCurrentTransaction().getId());
+
+        Collection<SplitRule> foundSplitRules = foundTransaction.getSplitRules();
+        Assert.assertEquals(splitRules.size(), foundSplitRules.size());
+    }
+
+    @Test
+    public void testSplitSubscriptionAmount() throws Throwable {
+
+        Subscription subscription = subscriptionFactory.createCreditCardSubscription(defaultPlanWithoutTrialDays.getId(),defaultCard.getId(), defaultCustomer);
+        Collection<SplitRule> splitRules = splitRulesFactory.createSplitRuleWithAmount(defaultPlanWithoutTrialDays);
 
         subscription.setSplitRules(splitRules);
         subscription.save();
